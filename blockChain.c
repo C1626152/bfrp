@@ -3,18 +3,17 @@
 #include "time"
 #include "stdlib.h"
 #include "string.h"
+// #include "MicroBit.h"
+// https://lancaster-university.github.io/microbit-docs/ubit/io/
+// or
+// https://lancaster-university.github.io/microbit-docs/ubit/serial/#example
+// Probably this one ^^^
 
 
 // Create block structure
 struct block
 {
-	/*
-	Each block contains:
-		Hash number
-		integer called data
-		previous block link location
 
-	*/
 	// Must add Hashcode1, Hashcode2, currentTime, sessionObjectives, serialisationNumber
 	unsigned char prevHash[SHA256_DIGEST_LENGTH];
 	int data;
@@ -45,10 +44,7 @@ void printBlock();
 // Print all blocks
 void printAllBlocks();
 
-int i->1
 
-// SHA256(src, size, dest)
-// src and dest are type of unsigned char *
 
 // add a block to the chain
 // Need some help discussing the workings of this
@@ -233,7 +229,8 @@ void printAllBlocks()
 	-Build session objectives code
 		-malloc(sizeof(char)*length)
 			-dont forget to use free(string)
-			-
+
+
 */
 
 // Main function
@@ -241,7 +238,14 @@ void printAllBlocks()
 // This needs rewriting to allow for radio-triggered blockchain interactions instead
 void main()
 {
-	int c,n,r;
+	int c,n,r,i;
+	int i->1;
+	unsigned char* ownHashID -> "SomeHash4Me";
+	unsigned char* guestHashID -> "SomeHash4U";
+	time_t currentTime -> currentTime;
+	unsigned char* sessionObjectives -> "These are some objectives";
+	int serialisationNumber -> i;
+
 	printf("1)addBlock\n2)add n random blocks\n3)alter nth block\n4)print all blocks\n5)verify chain\n");
 	while(1)
 	{
@@ -252,7 +256,7 @@ void main()
 			case 1:
 				printf("Enter data: ");
 				scanf("%d",&n);
-				addBlock(n);
+				addBlock(n, ownHashID, guestHashID, currentTime, sessionObjectives, serialisationNumber);
 				break;
 			case 2:
 				printf("How Many blocks to enter?: ");
