@@ -1,6 +1,6 @@
+#include "openssl/sha.h"
 #include "stdio.h"
-#include "openssl/crypto.h"
-#include "time"
+#include "time.h"
 #include "stdlib.h"
 #include "string.h"
 // #include "MicroBit.h"
@@ -28,7 +28,7 @@ struct block
 // *head is the header pointing to the next ref in the chain?
 }*head;
 // Adds new block
-void addBlock(int data, unsigned char* sessionObjectives, time_t currentTime);
+void addBlock(int data, unsigned char* sessionObjectives, time_t currentTime, int serialisationNumber);
 // verifys chain integrity
 void verifyChain();
 // alters the block at position n [redundent feature]
@@ -48,7 +48,7 @@ void printAllBlocks();
 
 // add a block to the chain
 // Need some help discussing the workings of this
-void addBlock(int data, unsigned char* sessionObjectives, time_t currentTime, int i)
+void addBlock(int data, unsigned char* sessionObjectives, time_t currentTime, int serialisationNumber)
 {
 	// If head is empty generate genesis block
 	if(head==NULL)
@@ -58,12 +58,11 @@ void addBlock(int data, unsigned char* sessionObjectives, time_t currentTime, in
 		// head now equals a memory address
 		head=malloc(sizeof(struct block));
 		// Hash "" and the size of "" and store in previous hash location(retrived from head)
-		SHA256("",sizeof(""),head->prevHash);
+		SHA256((unsigned char*)"",sizeof(""),head->prevHash);
 		// head should now read block data
-		head->blockData=data;
+		head->data=data;
 		return;
 	}
-	int i++;
 	struct block *currentBlock=head;
 	// While there is a previous block (i.e blockchain is valid) do:
 	while(currentBlock->link)
@@ -75,7 +74,7 @@ void addBlock(int data, unsigned char* sessionObjectives, time_t currentTime, in
 	currentBlock->link=newBlock;
 	// New blocks data is now at this memory address
 	// Add own data here
-	newBlock->blockData=data;
+	newBlock->data=data;
 	// Add extra data:
 	/*
 	time_t currentTime;
@@ -84,7 +83,7 @@ void addBlock(int data, unsigned char* sessionObjectives, time_t currentTime, in
 	*/
 	// Add session objectives
 	newBlock->sessionObjectives = sessionObjectives;
-	serialisationNumber -> i = serialisationNumber;
+	newBlock->serialisationNumber = serialisationNumber;
 
 	// Generate hash of current block and old block?
 	SHA256(toString(*currentBlock),sizeof(*currentBlock),newBlock->prevHash);
@@ -113,7 +112,7 @@ void verifyChain()
 	int count=1;
 	while(curr)
 	{
-		printf("%d\t[%d]\t\n",count++,curr->blockData);
+		printf("%d\t[%d]\t\n",count++,curr->data);
 		hashPrinter(SHA256(toString(*prev),sizeof(*prev),NULL),SHA256_DIGEST_LENGTH);
 		printf(" - ");
 		hashPrinter(curr->prevHash, SHA256_DIGEST_LENGTH);
@@ -139,6 +138,7 @@ void alterNthBlock(int n, int newData)
 		return;
 
 	}
+	int count = 0;
 	// while n is valid:
 	while(count!=n)
 	{
@@ -160,7 +160,7 @@ void alterNthBlock(int n, int newData)
 	// Print fore and aft data
 	printf("Before: ");
 		printBlock(curr);
-	curr->blockData=newData;
+	curr->data=newData;
 	printf("\nAfter: ");
 		printBlock(curr);
 	printf("\n");
@@ -200,11 +200,11 @@ void printBlock(struct block *b)
 {
 	printf("%p\t",b);	
 	hashPrinter(b->prevHash,sizeof(b->prevHash));
-	printf("Block hash: \t[%d]\t \n",b->blockData);
+	printf("Block hash: \t[%d]\t \n",b->data);
 	printf("Block contents:\n");
-	printf("Guest hash: %u \n", b->guestHashID);
-	printf("Time block created: %lld \n", b->currentTime);
-	printf("Session Objectives: %u \n", b->sessionObjectives)
+	printf("Guest hash: %s \n", b->guestHashID);
+	printf("Time block created: %ld \n", b->currentTime);
+	printf("Session Objectives: %s \n", b->sessionObjectives)
 	printf("%p\n",b->link);
 
 }
@@ -236,15 +236,14 @@ void printAllBlocks()
 // Main function
 // Switch statements to let user select functions
 // This needs rewriting to allow for radio-triggered blockchain interactions instead
-void main()
+int main()
 {
-	int c,n,r,i;
-	int i->1;
-	unsigned char* ownHashID -> "SomeHash4Me";
-	unsigned char* guestHashID -> "SomeHash4U";
-	time_t currentTime -> currentTime;
-	unsigned char* sessionObjectives -> "These are some objectives";
-	int serialisationNumber -> i;
+	int c,n,r;
+	// time_t timeNow;
+	// unsigned char* ownHashID -> "SomeHash4Me";
+	// unsigned char* guestHashID -> "SomeHash4U";
+	// time_t currentTime -> currentTime;
+	// unsigned char* sessionObjectives -> "These are some objectives";
 
 	printf("1)addBlock\n2)add n random blocks\n3)alter nth block\n4)print all blocks\n5)verify chain\n");
 	while(1)
@@ -256,7 +255,8 @@ void main()
 			case 1:
 				printf("Enter data: ");
 				scanf("%d",&n);
-				addBlock(n, ownHashID, guestHashID, currentTime, sessionObjectives, serialisationNumber);
+				//int data, unsigned char* sessionObjectives, time_t currentTime, int serialisationNumber
+				addBlock(n, "Delay", time(&timeNow), 1);
 				break;
 			case 2:
 				printf("How Many blocks to enter?: ");
@@ -283,7 +283,7 @@ void main()
 				break;
 			default:
 				printf("Bad choice! :((((\n");
-				break
+				break;
 
 		}
 	}
