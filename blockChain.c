@@ -21,14 +21,14 @@ struct block
 	unsigned char* ownHashID;
 	unsigned char* guestHashID;
 	time_t currentTime;
-	unsigned char* sessionObjectives;
+	unsigned char* newHash;
 	int serialisationNumber;
 
 
 // *head is the header pointing to the next ref in the chain?
 }*head;
 // Adds new block
-void addBlock(int data, unsigned char* sessionObjectives, time_t currentTime, int serialisationNumber);
+void addBlock(int data, unsigned char* newHash, time_t currentTime, int serialisationNumber);
 // verifys chain integrity
 void verifyChain();
 // alters the block at position n [redundent feature]
@@ -48,7 +48,7 @@ void printAllBlocks();
 
 // add a block to the chain
 // Need some help discussing the workings of this
-void addBlock(int data, unsigned char* sessionObjectives, time_t currentTime, int serialisationNumber)
+void addBlock(int data, unsigned char* newHash, time_t currentTime, int serialisationNumber)
 {
 	// If head is empty generate genesis block
 	if(head==NULL)
@@ -70,6 +70,10 @@ void addBlock(int data, unsigned char* sessionObjectives, time_t currentTime, in
 		currentBlock=currentBlock->link;
 	// New block created in memory with malloc
 	struct block *newBlock=malloc(sizeof(struct block));
+	// creates area in memory for hashes to be stored for blocks
+	malloc hashData = (sizeof(char*)SHA256_DIGEST_LENGTH);
+	// Copy data from memory
+	memcpy(hashData, newHash, SHA256_DIGEST_LENGTH);
 	// New block gets linked to old block
 	currentBlock->link=newBlock;
 	// New blocks data is now at this memory address
@@ -82,7 +86,7 @@ void addBlock(int data, unsigned char* sessionObjectives, time_t currentTime, in
 	int serialisationNumber;
 	*/
 	// Add session objectives
-	newBlock->sessionObjectives = sessionObjectives;
+	newBlock->hashData = hashData;
 	newBlock->serialisationNumber = serialisationNumber;
 
 	// Generate hash of current block and old block?
@@ -204,7 +208,7 @@ void printBlock(struct block *b)
 	printf("Block contents:\n");
 	printf("Guest hash: %s \n", b->guestHashID);
 	printf("Time block created: %ld \n", b->currentTime);
-	printf("Session Objectives: %s \n", b->sessionObjectives)
+	printf("Session Objectives: %s \n", b->newHash);
 	printf("%p\n",b->link);
 
 }
@@ -239,7 +243,7 @@ void printAllBlocks()
 int main()
 {
 	int c,n,r;
-	// time_t timeNow;
+	time_t timeNow;
 	// unsigned char* ownHashID -> "SomeHash4Me";
 	// unsigned char* guestHashID -> "SomeHash4U";
 	// time_t currentTime -> currentTime;
@@ -265,7 +269,7 @@ int main()
 				{
 					r=rand()%(n*10);
 					printf("Entering: %d\n",r);
-					addBlock(r);
+					addBlock(n, "Delay", time(&timeNow), 1);
 				}
 				break;
 			case 3:
