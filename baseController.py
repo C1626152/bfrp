@@ -108,6 +108,7 @@ def main():
 """
 		elif choice == 3:
 			writeUserHash()
+			print("New user hash is: \n", newUserHash)
 			writeToMicrobit(newUserHash)
 """
 		elif choice == 0:
