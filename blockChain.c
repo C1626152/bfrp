@@ -48,7 +48,7 @@ void printAllBlocks();
 
 // add a block to the chain
 // Need some help discussing the workings of this
-void addBlock(int data, unsigned char* newHash, time_t currentTime, int serialisationNumber)
+void addBlock(int data, unsigned char* sessionObjectives, time_t currentTime, int serialisationNumber)
 {
 	// If head is empty generate genesis block
 	if(head==NULL)
@@ -71,9 +71,9 @@ void addBlock(int data, unsigned char* newHash, time_t currentTime, int serialis
 	// New block created in memory with malloc
 	struct block *newBlock=malloc(sizeof(struct block));
 	// creates area in memory for hashes to be stored for blocks
-	malloc hashData = (sizeof(char*)SHA256_DIGEST_LENGTH);
+	char* hashData = malloc(sizeof(char)*SHA256_DIGEST_LENGTH);
 	// Copy data from memory
-	memcpy(hashData, newHash, SHA256_DIGEST_LENGTH);
+	memcpy(hashData, sessionObjectives, SHA256_DIGEST_LENGTH);
 	// New block gets linked to old block
 	currentBlock->link=newBlock;
 	// New blocks data is now at this memory address
@@ -86,7 +86,7 @@ void addBlock(int data, unsigned char* newHash, time_t currentTime, int serialis
 	int serialisationNumber;
 	*/
 	// Add session objectives
-	newBlock->hashData = hashData;
+	newBlock->newHash = (unsigned char*) hashData;
 	newBlock->serialisationNumber = serialisationNumber;
 
 	// Generate hash of current block and old block?
@@ -94,12 +94,12 @@ void addBlock(int data, unsigned char* newHash, time_t currentTime, int serialis
 }
 
 /*hashPrinter
-he generates the hash of the previous block. doesn't store it because we aren't modifying or writing, just checking it against the value that is already stored. 
+he generates the hash of the previous block. doesn't store it because we aren't modifying or writing, just checking it against the value that is already stored.
 He then prints the stored version on line 75 with the second call to hashPrinter. so you would be able to see that it matches or differes.
 
-However, his next line is to hashCompare, where he generates the hash of the previous block a second time. so he's repeating a step, so this part really takes twice as long as it needs to. 
+However, his next line is to hashCompare, where he generates the hash of the previous block a second time. so he's repeating a step, so this part really takes twice as long as it needs to.
 
-This could be modifed to remove the two calls to hashPrinter. Instead, it would be better to inside hashCompare print str1 and str2 in the same way to give you that visual comparison, you're then only generating it once. 
+This could be modifed to remove the two calls to hashPrinter. Instead, it would be better to inside hashCompare print str1 and str2 in the same way to give you that visual comparison, you're then only generating it once.
 
 equally, if it matches, do you really want it printed out? it would be better if it only printed it out when it failed, otherwise the screen will get very cluttered. This one is my opinion, and it depends on what you want from the program. if printing the valid data is useful to you then that's fine.
 */
@@ -162,10 +162,10 @@ void alterNthBlock(int n, int newData)
 	}
 	// Print fore and aft data
 	printf("Before: ");
-		printBlock(curr);
+	printBlock(curr);
 	curr->data=newData;
 	printf("\nAfter: ");
-		printBlock(curr);
+	printBlock(curr);
 	printf("\n");
 }
 
@@ -201,7 +201,7 @@ int hashCompare(unsigned char *str1,unsigned char *str2)
 
 void printBlock(struct block *b)
 {
-	printf("%p\t",b);	
+	printf("%p\t",b);
 	hashPrinter(b->prevHash,sizeof(b->prevHash));
 	printf("Block hash: \t[%d]\t \n",b->data);
 	printf("Block contents:\n");
@@ -232,6 +232,7 @@ int main()
 {
 	int c,n,r;
 	time_t timeNow;
+	unsigned char* sessObjects = malloc(sizeof(char) * 100);
 	// unsigned char* ownHashID -> "SomeHash4Me";
 	// unsigned char* guestHashID -> "SomeHash4U";
 	// time_t currentTime -> currentTime;
@@ -247,8 +248,9 @@ int main()
 			case 1:
 				printf("Enter data: ");
 				scanf("%d",&n);
+				memcpy(sessObjects, "Delay", strlen("Delay"));
 				//int data, unsigned char* sessionObjectives, time_t currentTime, int serialisationNumber
-				addBlock(n, "Delay", time(&timeNow), 1);
+				addBlock(n, sessObjects, time(&timeNow), 1);
 				break;
 			case 2:
 				printf("How Many blocks to enter?: ");
@@ -257,7 +259,8 @@ int main()
 				{
 					r=rand()%(n*10);
 					printf("Entering: %d\n",r);
-					addBlock(n, "Delay", time(&timeNow), 1);
+					memcpy(sessObjects, "Delay", strlen("Delay"));
+					addBlock(n, sessObjects, time(&timeNow), 1);
 				}
 				break;
 			case 3:
@@ -286,8 +289,3 @@ int main()
 // ./blockChain.c.o
 
 // Made with help from: https://www.youtube.com/watch?v=1O-XnbRYJHM
-
-
-
-
-
