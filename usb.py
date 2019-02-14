@@ -2,6 +2,9 @@ import serial
 
 out = serial.Serial('/dev/ttyUSB0', 9600)
 
+prePack = Queue()
+incoming = Queue()
+
 # Python script to handle data from RPi to microbit and back again
 # To do:
 """
@@ -29,21 +32,50 @@ class Queue:
     def size(self):
         return len(self.items)
 
-prePack = Queue()
+
 # Function to send data over USB ()
 def send(data):
 	# serial must send data as strings
 	while True:
-		# Convert data to string
-		data = str(data)
+		if isinstance(data, str):
+			continue
+		else:
+			# Convert data to string
+			data = str(data)
 		# add data to queue
 		prePack.enqueue(data)
-		# Use something similar to: "'{0}F{1}S{2}T'.format(first_data, second_data, third_data)" to package data
-		# 
-		# 
-		# out.write(someVarStoringData)
+		# Currently data is stored like so: prePack[data1, data2, data3[data3a, data3b, data3c]]
+		# Use something similar to: "'{0}F{1}S{2}T'.format(first_data, second_data, third_data)" to package data?
+
+	# This is outside of loop so it gets sent
+	# out.write(someVarStoringData)
+	for x in prePack:
+		out.write(x)
 
 # Function to receive data over USB (New blocks)
 def recieve(data):
+	inPort = serial.threaded.LineReader()
+	# Get clarity on how to code the serial.out side of this for reading data.
+	serial.out.__init__
 	# Think about how data is going to be sent via USB (probs as strings)
+	for i in len(data):
+		incoming.enqueue(i)
+
+		# split data if needed else return as a string
 	# Must split extra data?
+
+
+# Use following to test port numbers:
+# python -m serial.tools.list_ports
+
+# Use this to access port in terminal for testing:
+# python -m serial.tools.miniterm <port_name>
+
+# Reading for USB:
+# http://www.brainboxes.com/faq/items/what-is-rts--cts-hardware-flow-control-
+# https://pyserial.readthedocs.io/en/latest/pyserial_api.html
+
+
+
+
+

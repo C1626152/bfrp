@@ -93,9 +93,8 @@ void addBlock(int data, unsigned char* newHash, time_t currentTime, int serialis
 	SHA256(toString(*currentBlock),sizeof(*currentBlock),newBlock->prevHash);
 }
 
-// Need help explaining this one
-/*line 73 (for me, but it's where the hashPrinter call is).
-he generates the hash of the previous block, fine. doesn't store it because we aren't modifying or writing, just checking it against the value that is already stored. 
+/*hashPrinter
+he generates the hash of the previous block. doesn't store it because we aren't modifying or writing, just checking it against the value that is already stored. 
 He then prints the stored version on line 75 with the second call to hashPrinter. so you would be able to see that it matches or differes.
 
 However, his next line is to hashCompare, where he generates the hash of the previous block a second time. so he's repeating a step, so this part really takes twice as long as it needs to. 
@@ -225,17 +224,6 @@ void printAllBlocks()
 	}
 
 }
-
-// ==========================================
-// =				TO DO 					=
-// ==========================================
-/*
-	-Build session objectives code
-		-malloc(sizeof(char)*length)
-			-dont forget to use free(string)
-
-
-*/
 
 // Main function
 // Switch statements to let user select functions

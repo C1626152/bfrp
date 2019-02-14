@@ -1,0 +1,26 @@
+def displayPage(data, hashData):
+	print("""<!DOCTYPE html>
+	<html>
+	<head>
+	<title>Found Data</title>
+	</head>
+	<body>
+		<span>
+			<h1>Found Data:</h1>
+			<div>
+				<h3>Block Data</h3>""")
+	# Print block data
+	for i in data:
+		print(i)
+
+	print("""		</div>
+			<div>
+				<h3>Hashes</h3>""")
+	# Print hashes of blocks
+	for k in hashData:
+		print(k)
+
+	print("""		</div>
+		</span>
+	</body>
+	</html>""")
