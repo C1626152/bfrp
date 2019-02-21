@@ -8,6 +8,7 @@
 // or
 // https://lancaster-university.github.io/microbit-docs/ubit/serial/#example
 // Probably this one ^^^
+// Need to begin including fibre
 
 
 // Create block structure
@@ -93,16 +94,7 @@ void addBlock(int data, unsigned char* sessionObjectives, time_t currentTime, in
 	SHA256(toString(*currentBlock),sizeof(*currentBlock),newBlock->prevHash);
 }
 
-/*hashPrinter
-he generates the hash of the previous block. doesn't store it because we aren't modifying or writing, just checking it against the value that is already stored.
-He then prints the stored version on line 75 with the second call to hashPrinter. so you would be able to see that it matches or differes.
 
-However, his next line is to hashCompare, where he generates the hash of the previous block a second time. so he's repeating a step, so this part really takes twice as long as it needs to.
-
-This could be modifed to remove the two calls to hashPrinter. Instead, it would be better to inside hashCompare print str1 and str2 in the same way to give you that visual comparison, you're then only generating it once.
-
-equally, if it matches, do you really want it printed out? it would be better if it only printed it out when it failed, otherwise the screen will get very cluttered. This one is my opinion, and it depends on what you want from the program. if printing the valid data is useful to you then that's fine.
-*/
 void verifyChain()
 {
 	// If empty, say so

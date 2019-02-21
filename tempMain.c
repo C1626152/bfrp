@@ -1,4 +1,7 @@
 
+
+
+
 checkNewMessages(char* newHash)
 {
     if(usbReceivedData)
@@ -25,14 +28,19 @@ int main()
 
 	while(1)
 	{
+		// Create instance of usb connection
+		MicroBitSerial serial(USBTX, USBRX);
+		// Create thread for RX?
+			// Add add to assigned place in memory
+
+
 		// listen for radio signal
 
 			// Send ACK
 			// Send SYN
 			// Wait for ACK
 
-		// listen for USB data
-			// Add add to assigned place in memory
+		
 		if(checkNewMessages(newHash))
 		{
 			addBlock(n, newHash, time(timeNow), serialisationNumber);

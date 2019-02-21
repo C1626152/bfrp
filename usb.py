@@ -1,6 +1,10 @@
 import serial
+import usb.core 
+import usb.util
 
-out = serial.Serial('/dev/ttyUSB0', 9600)
+# Follow this: https://www.youtube.com/watch?v=xH_y05pIDTo
+
+out = serial.Serial(port='/dev/ttyUSB0', baudrate=115200, timeout=1)
 
 prePack = Queue()
 incoming = Queue()
@@ -54,14 +58,11 @@ def send(data):
 
 # Function to receive data over USB (New blocks)
 def recieve(data):
-	inPort = serial.threaded.LineReader()
-	# Get clarity on how to code the serial.out side of this for reading data.
-	serial.out.__init__
 	# Think about how data is going to be sent via USB (probs as strings)
-	for i in len(data):
-		incoming.enqueue(i)
+	while True:
+		incoming.enqueue(str(out.readline()))
 
-		# split data if needed else return as a string
+	# split data if needed else return as a string
 	# Must split extra data?
 
 
