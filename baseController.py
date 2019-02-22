@@ -156,7 +156,7 @@ def main():
 		print("\nUSB Connection error!\n")
 
 	while True:
-		choice = input("Select Option:\n 1 - Write session objectives\n 2 - Read block data\n 3 - ###UNUSED CURRENTLY### 0 - Exit")
+		choice = input("Select Option:\n 1 - Write session objectives\n 2 - Read block data\n 3 - Generate user hashes for visitor tags \n 4 - ###UNUSED CURRENTLY### 0 - Exit")
 		if choice == 1:
 			writeSessionObj()
 			usb.send(sessionObjectives)
@@ -165,20 +165,26 @@ def main():
 				display(data = currentData, hashData = currentHash, hashlist = hashList)
 			except:
 				print("\nError displaying data! D:\n")
-"""
 		elif choice == 3:
+			writeUserHash()
+			print("New user hash: \n")
+			print(newUserHash)
+
+		"""
+		Future functionality to write to microbit with user hash
+		elif choice == 4:
 			writeUserHash()
 			print("New user hash is: \n", newUserHash)
 			writeToMicrobit(newUserHash)
-"""
+		"""
 		# UNEXPECTED INDENT ERROR!?
 		elif choice == 0:
 			break
 
 		if usb.receieve() == True:
 			for i in usb.incoming:
-			i = usb.incoming.dequeue(i)
-			currentData.append(i)
+			k = usb.incoming.dequeue(i)
+			currentData.append(k)
 
 """
 TO DO:
@@ -188,7 +194,12 @@ Include method of writing hashcode to visitor microbit
 class unitTests(unittest.TestCase):
 	"""docstring for writeSessio"""
 	def testHash(self):
-		self.assertEqual(writeUserHash(this), 1EB79602411EF02CF6FE117897015FFF89F80FACE4ECCD50425C45149B148408)
+		try:
+			self.assertEqual(writeUserHash(this), 1EB79602411EF02CF6FE117897015FFF89F80FACE4ECCD50425C45149B148408)
+			print("Hashes test ok")
+		
+		except:
+			print("Hash tests fail D:")
 
 
 

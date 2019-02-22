@@ -53,8 +53,9 @@ def send(data):
 
 	# This is outside of loop so it gets sent
 	# out.write(someVarStoringData)
-	for x in prePack:
-		out.write(x)
+	if prePack.isEmpty() == False:
+		for x in prePack:
+			out.write(x)
 
 # Function to receive data over USB (New blocks)
 def recieve(data):
