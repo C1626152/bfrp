@@ -1,0 +1,41 @@
+{
+    "microbit-dal": {
+        "bluetooth": {
+            // Beacon will be active
+            "enabled": 1,
+            // New devices can pair with it
+            "pairing_mode": 1,
+            "private_addressing": 0,
+            "whitelist": 0,
+            "advertising_timeout": 0,
+            // Maximum TX power
+            // (Max 20dBm at <1m [0m] from device)
+            "tx_power": 20,
+            "dfu_service": 0,
+            "event_service": 0,
+            "device_info_service": 0,
+            "eddystone_url": 0,
+            // Beacon is sending User ID (Base station ID)
+            "eddystone_uid": 1
+        }
+    }
+}
+//  your config.json file may need to be adjusted to allow for the GATT and security capabilities
+// you want and you will need to ensure your hex file contains the Bluetooth services you plan to use as well.
+
+// https://lancaster-university.github.io/microbit-docs/ble/eddystone/
+
+
+// Technique for UID generation from:
+// https://github.com/google/eddystone/tree/master/eddystone-uid
+// UID derived from UUID4 from:
+// https://www.uuidgenerator.net/version4
+// 200b2dd4-2b70-4264-b552-f6d11b168adc
+// Remove bytes 5-10
+// New UUID:
+// 200b2dd4f6d11b168adc
+
+// Instance ID:
+// Generated from:
+// https://www.random.org/bytes/
+// 84 81 81 72 63 36 
