@@ -5,7 +5,7 @@
 #include "string.h"
 #include "unistd.h"
 
-// #include "MicroBit.h"
+#include "MicroBit.h"
 // https://lancaster-university.github.io/microbit-docs/ubit/io/
 // or
 // https://lancaster-university.github.io/microbit-docs/ubit/serial/#example
@@ -71,34 +71,34 @@ const int8_t CALIBRATED_POWERS[] = {-49, -37, -33, -28, -25, -20, -15, -10};
 void addBlock(int data, unsigned char* sessionObjectives, time_t currentTime, int serialisationNumber)
 {
 	// If head is empty generate genesis block
-	if(head==NULL)
+	if(head == NULL)
 	{
 		// Allocate an area of memory the size of a block
 		// head=malloc returns an address in memory
 		// head now equals a memory address
-		head=malloc(sizeof(struct block));
+		head = malloc(sizeof(struct block));
 		// Hash "" and the size of "" and store in previous hash location(retrived from head)
-		SHA256((unsigned char*)"",sizeof(""),head->prevHash);
+		SHA256((unsigned char*)"", sizeof(""), head->prevHash);
 		// head should now read block data
-		head->data=data;
+		head->data = data;
 		return;
 	}
-	struct block *currentBlock=head;
+	struct block *currentBlock = head;
 	// While there is a previous block (i.e blockchain is valid) do:
 	while(currentBlock->link)
 		// link between blocks
-		currentBlock=currentBlock->link;
+		currentBlock = currentBlock->link;
 	// New block created in memory with malloc
-	struct block *newBlock=malloc(sizeof(struct block));
+	struct block *newBlock = malloc(sizeof(struct block));
 	// creates area in memory for hashes to be stored for blocks
 	char* hashData = malloc(sizeof(char)*SHA256_DIGEST_LENGTH);
 	// Copy data from memory
 	memcpy(hashData, sessionObjectives, SHA256_DIGEST_LENGTH);
 	// New block gets linked to old block
-	currentBlock->link=newBlock;
+	currentBlock->link = newBlock;
 	// New blocks data is now at this memory address
 	// Add own data here
-	newBlock->data=data;
+	newBlock->data = data;
 	// Add extra data:
 	/*
 	time_t currentTime;
@@ -110,32 +110,32 @@ void addBlock(int data, unsigned char* sessionObjectives, time_t currentTime, in
 	newBlock->serialisationNumber = serialisationNumber;
 
 	// Generate hash of current block and old block?
-	SHA256(toString(*currentBlock),sizeof(*currentBlock),newBlock->prevHash);
+	SHA256(toString(*currentBlock), sizeof(*currentBlock), newBlock->prevHash);
 }
 
-
+// Possible to remove this(?)
 void verifyChain()
 {
 	// If empty, say so
-	if(head==NULL)
+	if(head == NULL)
 	{
 		printf("Blockchain is empty, add some blocks!\n");
 		return;
 	}
-	struct block *curr=head->link,*prev=head;
-	int count=1;
+	struct block *curr = head->link, *prev=head;
+	int count = 1;
 	while(curr)
 	{
-		printf("%d\t[%d]\t\n",count++,curr->data);
-		hashPrinter(SHA256(toString(*prev),sizeof(*prev),NULL),SHA256_DIGEST_LENGTH);
+		printf("%d\t[%d]\t\n", count++, curr->data);
+		hashPrinter(SHA256(toString(*prev), sizeof(*prev), NULL) ,SHA256_DIGEST_LENGTH);
 		printf(" - ");
 		hashPrinter(curr->prevHash, SHA256_DIGEST_LENGTH);
-		if(hashCompare(SHA256(toString(*prev),sizeof(*prev),NULL),curr->prevHash))
+		if(hashCompare(SHA256(toString(*prev), sizeof(*prev), NULL), curr->prevHash))
 			printf("Verified!\n");
 		else
 			printf("Verification Failed! :(\n");
-		prev=curr;
-		curr=curr->link;
+		prev = curr;
+		curr = curr->link;
 	}
 }
 
@@ -143,9 +143,9 @@ void verifyChain()
 unsigned char* toString(struct block b)
 {
 	// Creates space in memory the size of next block
-	unsigned char *str=malloc(sizeof(unsigned char)*sizeof(b));
+	unsigned char *str = malloc(sizeof(unsigned char)*sizeof(b));
 	// Copy it into a string
-	memcpy(str,&b,sizeof(b));
+	memcpy(str, &b, sizeof(b));
 	return str;
 	// This is so SHA256 can accept any data fed to it rather than rewrite the SHA256 alg
 }
@@ -153,14 +153,14 @@ unsigned char* toString(struct block b)
 // Print hash of block (by loc)
 void hashPrinter(unsigned char hash[], int length)
 {
-	for(int i=0;i<length;i++)
-		printf("%02x",hash[i]);
+	for(int i = 0; i<length; i++)
+		printf("%02x", hash[i]);
 }
 
 // Compare hash numbers
-int hashCompare(unsigned char *str1,unsigned char *str2)
+int hashCompare(unsigned char *str1, unsigned char *str2)
 {
-	for(int i=0;i<SHA256_DIGEST_LENGTH;i++)
+	for(int i = 0; i<SHA256_DIGEST_LENGTH; i++)
 		if(str1[i]!=str2[i])
 			return 0;
 		return 1;
@@ -201,10 +201,10 @@ char* checkNewDevices(char* guestHash)
 {
     if(radioReceivedData)
     {
-    	Char *lastblock = NULL;
-		Struct block *currentblock = head;
-		while(currentblock->next !=null){
-    		Currentblock = currentblock->next;
+    	char *lastblock = NULL;
+		struct block *currentBlock = head;
+		while(currentBlock->next !=null){
+    		currentBlock = currentBlock->next;
     	}
         //some types of verification of valid data received
         if(guestHash == hashCompare(guestHash, currentblock->hash)){
@@ -293,7 +293,8 @@ int main()
 			wait = sleep(wait);
         	// Check these values for correctness (some pointers missing)
         	addBlock(newHash, sessionObjectives, time(timeNow), serialisationNumber);
-			// This needs to be written properly:
+			// Needs function to return completed blocks via USB to the base controller unit
+			// Send new block on radio
 			connected(0);
 
 		}
@@ -306,16 +307,12 @@ int main()
 		}
 		// release_fiber();
 		
-
-		// Send completed block on USB
-
-		// Send new block on radio
 	}
 
 }
 
 
-// gcc blockChain2.c -o blockChain.c.o -lcrypto
+// gcc tempBlockChain.c -o blockChain.c.o -lcrypto
 // ./blockChain.c.o
 
 // Made with help from: https://www.youtube.com/watch?v=1O-XnbRYJHM
