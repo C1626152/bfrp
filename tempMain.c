@@ -1,6 +1,23 @@
+#include <unistd.h>
 
 
+void checkNewMessages(char* newHash);
+void checkNewDevices(char* guestHash);
+void startAdvertising();
+void stopAdvertising();
+void connected(int k);
+unsigned int sleep(unsigned int seconds);
 
+// power level of the broadcast beacon
+uint8_t tx_power_level = 10;
+// UIDD4 number
+char UID_NAMESPACE[] = {0x20,0x0b,0x2d,0xd4,0xf6,0xd1,0x1b,0x16,0x8a,0xdc}; // sha-1 hash of "com.bittysoftware" 
+// UID instance number
+char UID_INSTANCE[]  = {0x84, 0x81, 0x81, 0x72, 0x63, 0x36};
+// Powers that are calibrated for beacon
+const int8_t CALIBRATED_POWERS[] = {-49, -37, -33, -28, -25, -20, -15, -10};
+
+// Check for messages from usb
 char* checkNewMessages(char* newHash)
 {
     if(usbReceivedData)
@@ -14,11 +31,13 @@ char* checkNewMessages(char* newHash)
     }
 }
 
+// Check for guest devices hash (previous block) to compare and validate
 char* checkNewDevices(char* guestHash)
 {
     if(radioReceivedData)
     {
         //some types of verification of valid data received
+        if(guestHash == hashCompare(guestHash,))
         // memcpy(hash. radioReceivedData, SHA256_DIGEST_LENGTH);
         return guestHash;
     }
@@ -27,22 +46,30 @@ char* checkNewDevices(char* guestHash)
     }
 }
 
-void startAdvertising() {
+// Handles advertising start for beacon
+void startAdvertising(har UID_NAMESPACE[], char UID_INSTANCE[], int8_t CALIBRATED_POWERS[]) {
 	uBit.bleManager.advertiseEddystoneUid(UID_NAMESPACE, UID_INSTANCE, CALIBRATED_POWERS[tx_power_level-1], false);
 	uBit.bleManager.setTransmitPower(20);
-	uBit.display.scroll("ADV");
+	uBit.display.scroll("+ADV+");
 }
 
+// Kills advertising beacon
 void stopAdvertising() {
     uBit.bleManager.stopAdvertising();
-    uBit.display.scroll("OFF");
+    uBit.display.scroll("-ADV-");
 }
 
-// Wait function to delay adding a block
-void waitFor (unsigned int secs) {
-	// Need to wait for 10 mins
-    unsigned int retTime = time(0) + secs;   // Get finishing time.
-    while (time(0) < retTime);               // Loop until it arrives.
+// Function to handle connection status of beacon
+void connected(int k) {
+	if(k == 1){
+		stopAdvertising();
+	}
+	else if(k==0){
+		startAdvertising();
+	}
+	else{
+		return 0;
+	}
 }
 
 int main()
@@ -64,42 +91,44 @@ int main()
 	// Time (used for delaying block) 
 	time_t timeNow;
 	int c,n,r, connected;
-	char x;
+	// Is unsigned char the correct type?
+	unsigned char x = serial.read(ASYNC);
+	int wait = 600;
+
+	// Create instance of usb connection
+	MicroBitSerial serial(USBTX, USBRX);
+	serial.baud(115200);
 
 	while(1)
 	{
-		// Create instance of usb connection
-		MicroBitSerial serial(USBTX, USBRX);
+
 		// Create thread for RX?
-			// Add add to assigned place in memory
+		// Add to assigned place in memory
 		startAdvertising()
 
 		// listen for radio signal
-
-			// Send ACK
-			// Send SYN
-			// Wait for ACK
+		// Interact with visiting device
 
 		// Possibly change this function to be more appropriate?
 		// https://lancaster-university.github.io/microbit-docs/ble/ble-connection-events/
 		if(checkNewDevices(guestHash))
 		{
-			stopAdvertising()
-			connected = 1;
+			connected(1);
 			// Wait 10 minutes
-			addBlock(n, newHash, time(timeNow), serialisationNumber);
-			startAdvertising()
+			wait = sleep(wait);
+			// This needs to be written properly:
+			addBlock(newHash, sessionObjectives, time(timeNow), serialisationNumber);
+			connected(0);
 
 		}
 		
-		serial.baud(115200);
-		while(1)
+		while(x != MICROBIT_NO_DATA)
 		{
 		    x = serial.read(ASYNC);
-		    if(x != MICROBIT_NO_DATA)
-		      serial.send(x);
+		    // Is this method of assigning to variable correct?
+		    unsigned char* sessObjects = x;
 		}
-		release_fiber();
+		// release_fiber();
 		
 
 		// Send completed block on USB
