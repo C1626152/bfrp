@@ -22,12 +22,12 @@ char* checkNewMessages(char* newHash)
 {
     if(usbReceivedData)
     {
-        //some types of verification of valid data received
+        //some types of verification of valid data received?
         // memcpy(hash. newHash, SHA256_DIGEST_LENGTH);
         return newHash;
     }
     else{
-    	return NULL;
+    	return 0;
     }
 }
 
@@ -36,18 +36,26 @@ char* checkNewDevices(char* guestHash)
 {
     if(radioReceivedData)
     {
+    	Char *lastblock = NULL;
+		Struct block *currentblock = head;
+		while(currentblock->next !=null){
+    		Currentblock = currentblock->next;
+    	}
         //some types of verification of valid data received
-        if(guestHash == hashCompare(guestHash,))
-        // memcpy(hash. radioReceivedData, SHA256_DIGEST_LENGTH);
-        return guestHash;
+        if(guestHash == hashCompare(guestHash, currentblock->hash)){
+        	return 1;
+        }
+        else{
+        	return 0;
+        }
     }
     else{
-    	return NULL;
+    	return 0;
     }
 }
 
 // Handles advertising start for beacon
-void startAdvertising(har UID_NAMESPACE[], char UID_INSTANCE[], int8_t CALIBRATED_POWERS[]) {
+void startAdvertising() {
 	uBit.bleManager.advertiseEddystoneUid(UID_NAMESPACE, UID_INSTANCE, CALIBRATED_POWERS[tx_power_level-1], false);
 	uBit.bleManager.setTransmitPower(20);
 	uBit.display.scroll("+ADV+");
@@ -116,8 +124,9 @@ int main()
 			connected(1);
 			// Wait 10 minutes
 			wait = sleep(wait);
+        	// Check these values for correctness (some pointers missing)
+        	addBlock(newHash, sessionObjectives, time(timeNow), serialisationNumber);
 			// This needs to be written properly:
-			addBlock(newHash, sessionObjectives, time(timeNow), serialisationNumber);
 			connected(0);
 
 		}
