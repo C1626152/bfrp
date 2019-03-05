@@ -1,5 +1,5 @@
-import usb
-from usb import Queue
+import myUsb
+from myUsb import Queue
 import json
 import urllib2
 from hashlib import *
@@ -7,6 +7,7 @@ import random
 import unittest
 import Webbrowser
 import os
+
 
 """
 To Do:
@@ -78,19 +79,19 @@ def prepare(data):
 		json.dump(data, i)
 
 # Send data to html page and display page
-def display(data, hashData, hashlist):
-	blockData = Data
+def display(data, hashData, hashList):
+	blockData = data
 	wpgHashes = hashData
-	wpgHashList = hashlist
+	wpgHashList = hashList
 	contents = wpgMessage.format(**locals())
 	browseLocal(contents)
 
 # Prepares web page for display
 def browseLocal(webpageText = wpgMessage, filename='currentDataWPG.html'):
-    '''Starts a webbrowser on a local file containing the text
-    with given filename.'''
-    strToFile(webpageText, filename)
-    webbrowser.open("file:///" + os.path.abspath(filename))
+	'''Starts a webbrowser on a local file containing the text
+	with given filename.'''
+	strToFile(webpageText, filename)
+	webbrowser.open("file:///" + os.path.abspath(filename))
 
 # Writes string to a file
 def strToFile(data, filename):
@@ -147,6 +148,25 @@ def hashIt(data):
 		# Ensure that the script returns to sending signal code
 		return"""
 
+def quitProg():
+	break
+
+def sesObj():
+	writeSessionObj()
+	myUsb.send(sessionObjectives)
+
+def bData():
+	try:
+		display(data = currentData, hashData = currentHash, hashlist = hashList)
+	except:
+		print("\nError displaying data! D:\n")
+
+def genHash():
+	writeUserHash()
+	print("New user hash: \n")
+	print(newUserHash)
+
+
 
 def main():
 
@@ -155,51 +175,39 @@ def main():
 	except:
 		print("\nUSB Connection error!\n")
 
+	choice = { 0 : quitProg,
+			1 : sObj,
+			2 : bData,
+			3 : genHash}
+
 	while True:
-		choice = input("Select Option:\n 1 - Write session objectives\n 2 - Read block data\n 3 - Generate user hashes for visitor tags \n 4 - ###UNUSED CURRENTLY### 0 - Exit")
-		if choice == 1:
-			writeSessionObj()
-			usb.send(sessionObjectives)
-		elif choice == 2:
-			try:
-				display(data = currentData, hashData = currentHash, hashlist = hashList)
-			except:
-				print("\nError displaying data! D:\n")
-		elif choice == 3:
-			writeUserHash()
-			print("New user hash: \n")
-			print(newUserHash)
-
-		"""
-		Future functionality to write to microbit with user hash
-		elif choice == 4:
-			writeUserHash()
-			print("New user hash is: \n", newUserHash)
-			writeToMicrobit(newUserHash)
-		"""
-		# UNEXPECTED INDENT ERROR!?
-		elif choice == 0:
+		try: 
+			choice[input("Select Option:\n 1 - Write session objectives\n 2 - Read block data\n 3 - Generate user hashes for visitor tags \n 4 - ###UNUSED CURRENTLY### 0 - Exit")]()
+		except:
+			print("That isn't an available option") #should implement proper logging here and evaluate the catch
 			break
-
-		if usb.receieve() == True:
-			for i in usb.incoming:
-			k = usb.incoming.dequeue(i)
-			currentData.append(k)
+		
+		datalist = []
+		for i in incoming:
+			datalist.append(i)
+			incoming.dequeue(i)
+		for j in datalist:
+			currentData.append(j)
 
 """
 TO DO:
 Include method of writing hashcode to visitor microbit
 """
 # ============================================UNIT TESTS==============================================
-class unitTests(unittest.TestCase):
-	"""docstring for writeSessio"""
-	def testHash(self):
-		try:
-			self.assertEqual(writeUserHash(this), 1EB79602411EF02CF6FE117897015FFF89F80FACE4ECCD50425C45149B148408)
-			print("Hashes test ok")
+# class unitTests(unittest.TestCase):
+# 	"""docstring for writeSessio"""
+# 	def testHash(self):
+# 		try:
+# 			self.assertEqual(writeUserHash("this"), 1EB79602411EF02CF6FE117897015FFF89F80FACE4ECCD50425C45149B148408)
+# 			print("Hashes test ok")
 		
-		except:
-			print("Hash tests fail D:")
+# 		except:
+# 			print("Hash tests fail D:")
 
 
 

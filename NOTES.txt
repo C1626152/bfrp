@@ -24,3 +24,9 @@ Code
 	-Python started for visiting controller
 		-Try to have this implemented inside of 1 week
 	-USB
+
+=============================================
+=				Meeting 20-02-19			=
+=============================================
+Issues with implementing functions in C, segmentation errors slowing down dev to a crawl
+Instead began writing USB and baseController code

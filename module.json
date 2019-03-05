@@ -1,0 +1,18 @@
+{
+  "name": "bfrp",
+  "version": "0.3.0",
+  "description": "",
+  "keywords": [],
+  "author": "",
+  "homepage": "",
+  "licenses": [
+    {
+      "url": "https://spdx.org/licenses/MIT",
+      "type": "MIT"
+    }
+  ],
+  "dependencies": {
+    "microbit": "^2.1.1"
+  },
+  "bin": "./source"
+}

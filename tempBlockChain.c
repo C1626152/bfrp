@@ -4,14 +4,15 @@
 #include "stdlib.h"
 #include "string.h"
 #include "unistd.h"
-
 #include "MicroBit.h"
+
 // https://lancaster-university.github.io/microbit-docs/ubit/io/
 // or
 // https://lancaster-university.github.io/microbit-docs/ubit/serial/#example
 // Probably this one ^^^
-// Need to begin including fibre
+// Need to begin including fibre?
 
+MicroBit uBit;
 
 // Create block structure
 struct block
@@ -265,7 +266,7 @@ int main()
 	char* newHash = malloc(sizeOf(char)*SHA256_DIGEST_LENGTH);
 	// Time (used for delaying block) 
 	time_t timeNow;
-	int c,n,r, connected;
+	int c, n, r, connected;
 	// Is unsigned char the correct type?
 	unsigned char x = serial.read(ASYNC);
 	int wait = 600;
@@ -276,25 +277,29 @@ int main()
 
 	while(1)
 	{
-
 		// Create thread for RX?
 		// Add to assigned place in memory
-		startAdvertising()
+		startAdvertising();
 
 		// listen for radio signal
 		// Interact with visiting device
-
-		// Possibly change this function to be more appropriate?
 		// https://lancaster-university.github.io/microbit-docs/ble/ble-connection-events/
 		if(checkNewDevices(guestHash))
 		{
 			connected(1);
 			// Wait 10 minutes
 			wait = sleep(wait);
-        	// Check these values for correctness (some pointers missing)
+        	// Check these values for correctness (some pointers missing?)
+        	// 
         	addBlock(newHash, sessionObjectives, time(timeNow), serialisationNumber);
 			// Needs function to return completed blocks via USB to the base controller unit
+			// Clarify pointer required to send the next block to the base unit
+			// Confirm this is the correct pointer?	newBlock->newHash = (unsigned char*) hashData;
+			serial.send(newBlock*)
 			// Send new block on radio
+			// Confirm use of uBit message bus to pass data to BLE module
+			// Clarify pointer required to send this block
+			uBit.messageBus.send(newBlock*)
 			connected(0);
 
 		}
