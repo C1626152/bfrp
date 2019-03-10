@@ -5,10 +5,10 @@
   "keywords": ["bfrp"],
   "author": "Chloe Allen",
   "homepage": "https://github.com/c1626152/bfrp",
-  "repository"{
+  "repository": {
   	"url": "git@github.com:c1626152/bfrp",
-  	"type":"git"}  
-  "licenses":"MIT"
+  	"type":"git"},  
+  "license":"MIT",
   "dependencies": {
     "microbit": "^2.1.1"
   },

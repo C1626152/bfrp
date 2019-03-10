@@ -30,3 +30,27 @@ Code
 =============================================
 Issues with implementing functions in C, segmentation errors slowing down dev to a crawl
 Instead began writing USB and baseController code
+
+
+//  your config.json file may need to be adjusted to allow for the GATT and security capabilities
+// you want and you will need to ensure your hex file contains the Bluetooth services you plan to use as well.
+
+// https://lancaster-university.github.io/microbit-docs/ble/eddystone/
+
+
+=============================================
+=			Notes from config.json			=
+=============================================
+// Technique for UID generation from:
+// https://github.com/google/eddystone/tree/master/eddystone-uid
+// UID derived from UUID4 from:
+// https://www.uuidgenerator.net/version4
+// 200b2dd4-2b70-4264-b552-f6d11b168adc
+// Remove bytes 5-10
+// New UUID:
+// 200b2dd4f6d11b168adc
+
+// Instance ID:
+// Generated from:
+// https://www.random.org/bytes/
+// 84 81 81 72 63 36 
