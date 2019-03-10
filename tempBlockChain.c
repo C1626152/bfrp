@@ -140,7 +140,7 @@ void verifyChain()
 	}
 }
 
-//What is this for?
+//turns input into strings for hash alg
 unsigned char* toString(struct block b)
 {
 	// Creates space in memory the size of next block

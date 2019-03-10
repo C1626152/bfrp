@@ -4,7 +4,7 @@ import usb.util
 
 # Follow this: https://www.youtube.com/watch?v=xH_y05pIDTo
 
-out = serial.Serial(port='/dev/ttyUSB0', baudrate=115200, timeout=1)
+out = serial.Serial(port='/dev/ttyAMA0', baudrate=115200, timeout=1)
 
 prePack = Queue()
 incoming = Queue()

@@ -149,7 +149,7 @@ def hashIt(data):
 		return"""
 
 def quitProg():
-	break
+	sys.exit()
 
 def sesObj():
 	writeSessionObj()
@@ -185,7 +185,7 @@ def main():
 			choice[input("Select Option:\n 1 - Write session objectives\n 2 - Read block data\n 3 - Generate user hashes for visitor tags \n 4 - ###UNUSED CURRENTLY### 0 - Exit")]()
 		except:
 			print("That isn't an available option") #should implement proper logging here and evaluate the catch
-			break
+			return True
 		
 		datalist = []
 		for i in incoming:
