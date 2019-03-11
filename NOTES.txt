@@ -1,0 +1,56 @@
+NOTES
+
+Going back, so when malloc runs, you have newHash ready to go.
+
+Then you enter your while loop and continually check for new messages.  The if statement is just seeing a return value, yes there was, or no there wasn't. But, inside checkNewMessages you have further work going on, which reads the contents of the radio and if something is found, copies the data it received and stores it in the piece of RAM that newHash points at.
+
+When you return to the main, newHash will have been updated to contain the hash that was received. Then you pass the pointer for storage, again, it's the same newHash variable, which was updated inside checkforNewMessages.
+
+Inside addblock, you copy the data to a new malloc'd area of RAM and store it in a block. newHash is still holding the same data too, but on the next loop could be overwritten with the newest hash that will be added to the next new block
+
+=============================================
+=			Meeting 13-02-19				=
+=============================================
+Security concerns
+	-Must come up with method of anti-spoof for visiting controller
+	-Mention in report possibly, should consider for finished system if possible
+
+Code
+	-C program works to form simple blockchain
+		-segmentation errors currently preventing finishing
+		-finish methods of storing strings properly(?)
+		-Look to implement radio functionality by 2 weeks (28-02-19)
+		-Look to implement USB read/write within 2 weeks
+	-Python started for visiting controller
+		-Try to have this implemented inside of 1 week
+	-USB
+
+=============================================
+=				Meeting 20-02-19			=
+=============================================
+Issues with implementing functions in C, segmentation errors slowing down dev to a crawl
+Instead began writing USB and baseController code
+
+
+//  your config.json file may need to be adjusted to allow for the GATT and security capabilities
+// you want and you will need to ensure your hex file contains the Bluetooth services you plan to use as well.
+
+// https://lancaster-university.github.io/microbit-docs/ble/eddystone/
+
+
+=============================================
+=			Notes from config.json			=
+=============================================
+// Technique for UID generation from:
+// https://github.com/google/eddystone/tree/master/eddystone-uid
+// UID derived from UUID4 from:
+// https://www.uuidgenerator.net/version4
+// 200b2dd4-2b70-4264-b552-f6d11b168adc
+// Remove bytes 5-10
+// New UUID:
+// 200b2dd4f6d11b168adc
+
+// Instance ID:
+// Generated from:
+// https://www.random.org/bytes/
+// 84 81 81 72 63 36 

@@ -1,0 +1,16 @@
+{
+  "name": "bfrp",
+  "version": "0.3.0",
+  "description": "Bitcoin for responsible persons",
+  "keywords": ["bfrp"],
+  "author": "Chloe Allen",
+  "homepage": "https://github.com/c1626152/bfrp",
+  "repository": {
+  	"url": "git@github.com:c1626152/bfrp",
+  	"type":"git"},  
+  "license":"MIT",
+  "dependencies": {
+    "microbit": "^2.1.1"
+  },
+  "bin": "./source"
+}
