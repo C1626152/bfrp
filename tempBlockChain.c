@@ -31,6 +31,8 @@ struct block
 
 // *head is the header pointing to the next ref in the chain?
 }*head;
+
+
 // Adds new block
 void addBlock(int data, unsigned char* newHash, time_t currentTime, int serialisationNumber);
 // verifys chain integrity
@@ -38,15 +40,15 @@ void verifyChain();
 // Compares hashes for validity checking
 int hashCompare(unsigned char*,unsigned char*);
 // Prints hash numbers
-void hashPrinter();
+void hashPrinter(unsigned char hash[], int length);
 // Turns unsigned char hashes into strings for SHA256 alg to interpret
 unsigned char* toString(struct block);
 // Print one block
 // void printBlock();
 // Check for new messages
-void checkNewMessages(char* newHash);
+char* checkNewMessages(char* newHash);
 // Check for new devices within broadcast range
-void checkNewDevices(char* guestHash);
+int checkNewDevices(char* guestHash);
 // Begin beacon
 void startAdvertising();
 // Kill beacon
@@ -55,8 +57,12 @@ void stopAdvertising();
 void connected(int k);
 // wait to add block to chain
 unsigned int sleep(unsigned int seconds);
+// Declare memory space
+void run_once_initialisation();
+// Create instance of usb connection
+MicroBitSerial serial(USBTX, USBRX);
 
-
+char *lastBlock;
 // power level of the broadcast beacon
 uint8_t tx_power_level = 10;
 // UIDD4 number
@@ -77,11 +83,12 @@ void addBlock(int data, unsigned char* sessionObjectives, time_t currentTime, in
 		// Allocate an area of memory the size of a block
 		// head=malloc returns an address in memory
 		// head now equals a memory address
-		head = malloc(sizeof(struct block));
+		head = (struct block*)malloc(sizeof(struct block));
 		// Hash "" and the size of "" and store in previous hash location(retrived from head)
 		SHA256((unsigned char*)"", sizeof(""), head->prevHash);
 		// head should now read block data
 		head->data = data;
+
 		return;
 	}
 	struct block *currentBlock = head;
@@ -102,16 +109,23 @@ void addBlock(int data, unsigned char* sessionObjectives, time_t currentTime, in
 	newBlock->data = data;
 	// Add extra data:
 	/*
-	time_t currentTime;
 	unsigned char sessionObjectives;
 	int serialisationNumber;
 	*/
+	newBlock->time_t currentTime = currentTime;
 	// Add session objectives
 	newBlock->newHash = (unsigned char*) hashData;
 	newBlock->serialisationNumber = serialisationNumber;
 
 	// Generate hash of current block and old block?
 	SHA256(toString(*currentBlock), sizeof(*currentBlock), newBlock->prevHash);
+	// Update lastBlock
+	strcpy(lastBlock, newHash, 32);
+}
+
+void run_once_initialisation()
+{
+      lastBlock = (char*) malloc(sizeof(char * 32));
 }
 
 // Possible to remove this(?)
@@ -144,7 +158,7 @@ void verifyChain()
 unsigned char* toString(struct block b)
 {
 	// Creates space in memory the size of next block
-	unsigned char *str = malloc(sizeof(unsigned char)*sizeof(b));
+	unsigned char *str = (char*) malloc(sizeof(unsigned char)*sizeof(b));
 	// Copy it into a string
 	memcpy(str, &b, sizeof(b));
 	return str;
@@ -186,29 +200,30 @@ int hashCompare(unsigned char *str1, unsigned char *str2)
 // Check for messages from usb
 char* checkNewMessages(char* newHash)
 {
-    if(usbReceivedData)
+    if(x = serial.read(ASYNC))
     {
         //some types of verification of valid data received?
         // memcpy(hash. newHash, SHA256_DIGEST_LENGTH);
         return newHash;
     }
     else{
-    	return 0;
+    	return NULL;
     }
 }
 
 // Check for guest devices hash (previous block) to compare and validate
-char* checkNewDevices(char* guestHash)
+int checkNewDevices(char* guestHash)
 {
-    if(radioReceivedData)
+	ManagedString s = uBit.radio.datagram.recv();
+    if(s)
     {
-    	char *lastblock = NULL;
+    	char *lastBlock = NULL;
 		struct block *currentBlock = head;
-		while(currentBlock->next !=null){
-    		currentBlock = currentBlock->next;
+		while(currentBlock->link !=null){
+    		currentBlock = currentBlock->link;
     	}
         //some types of verification of valid data received
-        if(guestHash == hashCompare(guestHash, currentblock->hash)){
+        if(guestHash == hashCompare(s, currentBlock->hash)){
         	return 1;
         }
         else{
@@ -271,8 +286,7 @@ int main()
 	unsigned char x = serial.read(ASYNC);
 	int wait = 600;
 
-	// Create instance of usb connection
-	MicroBitSerial serial(USBTX, USBRX);
+	// Set baudrate for serial connection
 	serial.baud(115200);
 
 	while(1)
@@ -299,7 +313,7 @@ int main()
 			// Send new block on radio
 			// Confirm use of uBit message bus to pass data to BLE module
 			// Clarify pointer required to send this block
-			uBit.messageBus.send(newBlock*)
+			uBit.radio.datagram.send(toString(newBlock*));
 			connected(0);
 
 		}
