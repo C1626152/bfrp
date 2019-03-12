@@ -29,8 +29,7 @@ struct block
 	unsigned char* newHash;
 	ManagedString serialisationNumber;
 
-
-// *head is the header pointing to the next ref in the chain?
+// *head is the header of the linked list
 }*head;
 
 
@@ -125,6 +124,7 @@ struct block* addBlock(int data, unsigned char* sessionObjectives, time_t curren
 	// Generate hash of current block and old block?
 	SHA256(toString(*currentBlock), sizeof(*currentBlock), newBlock->prevHash);
 	// Update lastBlock
+
 	/*******************************
 	Originally: strcpy(lastBlock, newHash, 32);
 	newHash not declared previously, confirm this is the right data to set here.
@@ -141,7 +141,8 @@ void run_once_initialisation()
 	uBit.display.scroll("ON");
 	// Set baudrate for serial connection
 	serial.baud(115200);
-  	lastBlock = (char*) malloc(sizeof(char) * 32);
+  lastBlock = (char*) malloc(sizeof(char) * 32);
+
 }
 
 // Possible to remove this(?)
@@ -217,13 +218,13 @@ int hashCompare(unsigned char *str1, unsigned char *str2)
 char* checkNewMessages(char* newHash)
 {
 	char x;
+
     if(x = serial.read(ASYNC))
     {
         //some types of verification of valid data received?
         // memcpy(hash. newHash, SHA256_DIGEST_LENGTH);
         return newHash;
     }
-
 	return NULL;
 }
 
@@ -231,34 +232,33 @@ char* checkNewMessages(char* newHash)
 int checkNewDevices(char* guestHash)
 {
 	ManagedString s = uBit.radio.datagram.recv();
+
     if(s != NULL)
     {
 		struct block *currentBlock = head;
 		while(currentBlock->link != NULL){
     		currentBlock = currentBlock->link;
-    	}
-        //some types of verification of valid data received
+    }
+    //some types of verification of valid data received
 		/********************
 		Originally: hashCompare(s, currentBlock ->hash)
 
 		No member hash, check that newHash is the value you want to compare.
 		*********************/
-        if(hashCompare(s, currentBlock->newHash)){
-			/*************************************
-			//I think you want to return the hash to be stored in a new block?
-			//I think you'll want to calculate the hash of s as well though?
-			//Rather than return the string that was received, unless that's already a hash?
-			*********************/
-			memcpy(guestHash,s);
-        	return 1;
-        }
-        else{
-        	return 0;
-        }
+    if(hashCompare(s, currentBlock->newHash)){
+      /*************************************
+      //I think you want to return the hash to be stored in a new block?
+      //I think you'll want to calculate the hash of s as well though?
+      //Rather than return the string that was received, unless that's already a hash?
+      *********************/
+      memcpy(guestHash,s);
+      return 1;
     }
-
-	return 0;
-
+    else{
+      return 0;
+    }
+  }
+  return 0;
 }
 
 // Handles advertising start for beacon
@@ -291,6 +291,7 @@ void connected(int k) {
 
 int main()
 {
+
 	run_once_initialisation();
 
 	// Reserve a space in memory for newHashes
@@ -323,6 +324,7 @@ int main()
 		// listen for radio signal
 		// Interact with visiting device
 		// https://lancaster-university.github.io/microbit-docs/ble/ble-connection-events/
+
 		if(checkNewDevices(newHash))
 		{
 			connected(1);
@@ -360,7 +362,6 @@ int main()
 
 		}
 		// release_fiber();
-
 	}
 
 }
