@@ -1,21 +1,12 @@
 import myUsb
 from myUsb import Queue
 import json
-import urllib2
 from hashlib import *
 import random
 import unittest
-import Webbrowser
+import webbrowser
 import os
 
-
-"""
-To Do:
-	Function to store blockchain
-	Function to read blockchain
-	function to send manipulate JSON
-	main() function
-"""
 # stores all current data
 currentData = []
 # Stores the current hash value
@@ -71,12 +62,13 @@ wpgMessage = """<!DOCTYPE html>
 </html>"""
 # ======================================================================
 
-wpg = open(results.html, w)
+wpg = open("results.html", 'w+')
 # Writes data into JSON object
 # Currently unused (need to work out for C side of things)
 def prepare(data):
 	with open(packedData, 'w') as i:
 		json.dump(data, i)
+
 
 # Send data to html page and display page
 def display(data, hashData, hashList):
@@ -86,6 +78,7 @@ def display(data, hashData, hashList):
 	contents = wpgMessage.format(**locals())
 	browseLocal(contents)
 
+
 # Prepares web page for display
 def browseLocal(webpageText = wpgMessage, filename='currentDataWPG.html'):
 	'''Starts a webbrowser on a local file containing the text
@@ -93,25 +86,29 @@ def browseLocal(webpageText = wpgMessage, filename='currentDataWPG.html'):
 	strToFile(webpageText, filename)
 	webbrowser.open("file:///" + os.path.abspath(filename))
 
+
 # Writes string to a file
 def strToFile(data, filename):
-	outFile = open(filename, w)
+	outFile = open(filename, 'w+')
 	outFile.write(data)
 	outFile.close()
 
 # Write the session objectives and return as a hashnumber
 # Also adds unhashed objectives to a dict obj
+print("ok so far 7")
 def writeSessionObj():
 	tempObj = ''
 	newSessionObj = raw_input("\nInput session objectives for this session:\n")
 	tempObj = hashIt(newSessionObj)
 	hashList[tempObj] = newSessionObj
 
+
 # This hash function is theoretically insecure in this manner of use
 def writeUserHash():
 	first = raw_input("Input Users Name")
 	second = str(randint(1000000000,9999999999))
 	newUserHash = hashIt((first+second))
+
 
 def hashIt(data):
 	hashOut = str(hashlib.sha256(data))
@@ -147,39 +144,44 @@ def hashIt(data):
 	else:
 		# Ensure that the script returns to sending signal code
 		return"""
-
+print("ok so far 10")
 def quitProg():
 	sys.exit()
 
+print("ok so far 11")
 def sesObj():
 	writeSessionObj()
 	myUsb.send(sessionObjectives)
 
+print("ok so far 12")
 def bData():
 	try:
 		display(data = currentData, hashData = currentHash, hashlist = hashList)
 	except:
 		print("\nError displaying data! D:\n")
 
+print("ok so far 13")
 def genHash():
 	writeUserHash()
 	print("New user hash: \n")
 	print(newUserHash)
 
 
-
+print("ok so far, now for the main act!")
 def main():
-
+	
+	print("First Main, ok")
 	try:
+		print("trying")
 		out
 	except:
 		print("\nUSB Connection error!\n")
-
+	print("Second Main, ok")
 	choice = { 0 : quitProg,
 			1 : sObj,
 			2 : bData,
 			3 : genHash}
-
+	print("Trying to give the user a choice...")
 	while True:
 		try: 
 			choice[input("Select Option:\n 1 - Write session objectives\n 2 - Read block data\n 3 - Generate user hashes for visitor tags \n 4 - ###UNUSED CURRENTLY### 0 - Exit")]()
@@ -193,7 +195,7 @@ def main():
 			incoming.dequeue(i)
 		for j in datalist:
 			currentData.append(j)
-
+main()
 """
 TO DO:
 Include method of writing hashcode to visitor microbit

@@ -1,13 +1,14 @@
-import serial
+import serial.tools.list_ports
 import usb.core 
 import usb.util
 
 # Follow this: https://www.youtube.com/watch?v=xH_y05pIDTo
+pid = "2514"
+vid = "0424"
+ports = serial.tools.list_ports.comports()
+address = next(port for port in ports if (port.pid == pid and port.vid == vid))
+out = serial.Serial(port=address, baudrate=115200, timeout=1)
 
-out = serial.Serial(port='/dev/ttyAMA0', baudrate=115200, timeout=1)
-
-prePack = Queue()
-incoming = Queue()
 
 # Python script to handle data from RPi to microbit and back again
 # To do:
@@ -71,6 +72,8 @@ def recieve(data):
 
 	# split data if needed else return as a string
 	# Must split extra data?
+prePack = Queue()
+incoming = Queue()
 
 
 # Use following to test port numbers:

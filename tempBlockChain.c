@@ -6,10 +6,10 @@
 #include "string.h"
 #include "MicroBit.h"
 #include "MicroBitBLEManager.h
+#include <string>
+
 // https://lancaster-university.github.io/microbit-docs/ubit/io/
-// or
-// https://lancaster-university.github.io/microbit-docs/ubit/serial/#example
-// Probably this one ^^^
+
 // Need to begin including fibre?
 #define SHA256_DIGEST_LENGTH 32
 
@@ -55,12 +55,6 @@ void startAdvertising();
 void stopAdvertising();
 // Manage connections
 void connected(int k);
-/****************************
-This is not needed, there already exists a sleep function in the Microbit.h.
-Be warned, it's in milliseconds though, not seconds.
-// wait to add block to chain
-unsigned int sleep(unsigned int seconds);
-*****************************/
 // Declare memory space
 void run_once_initialisation();
 // Create instance of usb connection
@@ -123,12 +117,8 @@ struct block* addBlock(int data, unsigned char* sessionObjectives, time_t curren
 
 	// Generate hash of current block and old block?
 	SHA256(toString(*currentBlock), sizeof(*currentBlock), newBlock->prevHash);
+	
 	// Update lastBlock
-
-	/*******************************
-	Originally: strcpy(lastBlock, newHash, 32);
-	newHash not declared previously, confirm this is the right data to set here.
-	*******************************/
 	strncpy(lastBlock, hashData, 32);
 
 	return newBlock;
@@ -198,21 +188,6 @@ int hashCompare(unsigned char *str1, unsigned char *str2)
 		return 1;
 }
 
-// Print block and contents??
-// Modified to include other block data (Guest hash, time created and session objectives)
-
-// void printBlock(struct block *b)
-// {
-// 	printf("%p\t",b);
-// 	hashPrinter(b->prevHash,sizeof(b->prevHash));
-// 	printf("Block hash: \t[%d]\t \n",b->data);
-// 	printf("Block contents:\n");
-// 	printf("Guest hash: %s \n", b->guestHashID);
-// 	printf("Time block created: %ld \n", b->currentTime);
-// 	printf("Session Objectives: %s \n", b->newHash);
-// 	printf("%p\n",b->link);
-
-// }
 
 // Check for messages from usb
 char* checkNewMessages(char* newHash)
@@ -293,12 +268,13 @@ int main()
 {
 
 	run_once_initialisation();
-
+	
 	// Reserve a space in memory for newHashes
 	char* newHash = (char*)malloc(sizeof(char)*SHA256_DIGEST_LENGTH);
 	// Time (used for delaying block)
 	time_t timeNow;
-	// UNUSED: int c, n, r;
+	//String for handling incoming session Objectives rx'd over serial
+	std::string objString
 	/****************************
 	Changed unsigned char x to be just char sessObjects
 
@@ -306,15 +282,23 @@ int main()
 	As it was unsigned before, it would never equate, as it would always be read as positive.
 
 	If sessObjects is a single character then OK. But, if you'll want strings, then this will need to modified.
+	* 
+	* CHLOE: No the seeObjects will be coming in the form of a string of hex numbers (already hashed), to save on size/space
 	****************************/
-	int sessObjects;
+	std::string objString = serial.read(ASYNC);
 	int wait = 600*1000; //600 seconds in milliseconds
-	/****************************************
-	DEFINED AS TEMP, NEED TO SOURCE THEM CORRECTLY
-	*****************************************/
-	char sessionObjectives[] = "YAY";
-	ManagedString serialisationNumber = uBit.getSerial();
 
+	ManagedString serialisationNumber = uBit.getSerial();
+		// This will keep reading data until no more data is present
+	while(sessObjects != MICROBIT_NO_DATA)
+	{
+		/*x = serial.read(ASYNC);
+		// Is this method of assigning to variable correct?
+		unsigned char* sessObjects = x;*/
+		sessObjects = serial.read(ASYNC);
+
+	}
+	
 	while(1)
 	{
 		// Create thread for RX?
@@ -330,16 +314,7 @@ int main()
 			connected(1);
 			// Wait 10 minutes
 			uBit.sleep(wait);
-        	// Check these values for correctness (some pointers missing?)
-        	//
-			/****************************
-			SessionObjectives in below is not defined in this scope.
-			If you are reading them from the serial connection then probably want a call before this to read them
-			I've declared a variable above just to get rid of the error, but you'll need to make sure they are set in time for this call.
-			Possibly the while loop below where you are reading them?
 
-			serialisationNumber also not defined
-			****************************/
         	struct block* newBlock = addBlock(newHash, sessionObjectives, time(&timeNow), serialisationNumber);
 			// Needs function to return completed blocks via USB to the base controller unit
 			// Clarify pointer required to send the next block to the base unit
@@ -352,15 +327,7 @@ int main()
 			connected(0);
 
 		}
-		// This will keep reading data until no more data is present
-		while(sessObjects != MICROBIT_NO_DATA)
-		{
-		    /*x = serial.read(ASYNC);
-		    // Is this method of assigning to variable correct?
-		    unsigned char* sessObjects = x;*/
-			sessObjects = serial.read(ASYNC);
 
-		}
 		// release_fiber();
 	}
 
