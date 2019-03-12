@@ -7,6 +7,11 @@
 #include "MicroBit.h"
 #include "MicroBitBLEManager.h
 #include <string>
+#include "sha256.h"
+
+
+
+
 
 // https://lancaster-university.github.io/microbit-docs/ubit/io/
 
