@@ -5,7 +5,7 @@
 #include "stdlib.h"
 #include "string.h"
 #include "MicroBit.h"
-#include "MicroBitBLEManager.h
+#include "MicroBitBLEManager.h"
 #include <string>
 #include "sha256.h"
 
@@ -88,11 +88,11 @@ struct block* addBlock(int data, unsigned char* sessionObjectives, time_t curren
 		// head now equals a memory address
 		head = (struct block*)malloc(sizeof(struct block));
 		// Hash "" and the size of "" and store in previous hash location(retrived from head)
-		SHA256((unsigned char*)"", sizeof(""), head->prevHash);
+		calc_sha_256((unsigned char*)"", sizeof(""), head->prevHash);
 		// head should now read block data
 		head->data = data;
 
-		return;
+		return head;
 	}
 	struct block *currentBlock = head;
 	// While there is a previous block (i.e blockchain is valid) do:
@@ -121,7 +121,7 @@ struct block* addBlock(int data, unsigned char* sessionObjectives, time_t curren
 	newBlock->serialisationNumber = serialisationNumber;
 
 	// Generate hash of current block and old block?
-	SHA256(toString(*currentBlock), sizeof(*currentBlock), newBlock->prevHash);
+	calc_sha_256(toString(*currentBlock), sizeof(*currentBlock), newBlock->prevHash);
 	
 	// Update lastBlock
 	strncpy(lastBlock, hashData, 32);
@@ -154,7 +154,7 @@ void verifyChain()
 	while(curr)
 	{
 		printf("%d\t[%d]\t\n", count++, curr->data);
-		hashPrinter(SHA256(toString(*prev), sizeof(*prev), NULL) ,SHA256_DIGEST_LENGTH);
+		hashPrinter(calc_sha_256(toString(*prev), sizeof(*prev), NULL) ,SHA256_DIGEST_LENGTH);
 		printf(" - ");
 		hashPrinter(curr->prevHash, SHA256_DIGEST_LENGTH);
 		if(hashCompare(SHA256(toString(*prev), sizeof(*prev), NULL), curr->prevHash))
@@ -213,7 +213,7 @@ int checkNewDevices(char* guestHash)
 {
 	ManagedString s = uBit.radio.datagram.recv();
 
-    if(s != NULL)
+    (if(s.length() != 0)
     {
 		struct block *currentBlock = head;
 		while(currentBlock->link != NULL){
@@ -295,12 +295,12 @@ int main()
 
 	ManagedString serialisationNumber = uBit.getSerial();
 		// This will keep reading data until no more data is present
-	while(sessObjects != MICROBIT_NO_DATA)
+	while(sessionObjectives != MICROBIT_NO_DATA)
 	{
 		/*x = serial.read(ASYNC);
 		// Is this method of assigning to variable correct?
-		unsigned char* sessObjects = x;*/
-		sessObjects = serial.read(ASYNC);
+		unsigned char* sessionObjectives = x;*/
+		sessionObjectives = serial.read(ASYNC);
 
 	}
 	
@@ -324,11 +324,12 @@ int main()
 			// Needs function to return completed blocks via USB to the base controller unit
 			// Clarify pointer required to send the next block to the base unit
 			// Confirm this is the correct pointer?	newBlock->newHash = (unsigned char*) hashData;
-			serial.send(toString(newBlock));
+			serial.send(toString(*newBlock));
+
 			// Send new block on radio
 			// Confirm use of uBit message bus to pass data to BLE module
 			// Clarify pointer required to send this block
-			uBit.radio.datagram.send(toString(newBlock));
+			uBit.radio.datagram.send(toString(*newBlock));
 			connected(0);
 
 		}

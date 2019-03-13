@@ -39,6 +39,16 @@ Instead began writing USB and baseController code
 
 
 =============================================
+=				Meeting 13-03-19			=
+=============================================
+
+There's two big issues at the moment, one is that openssl doesn't seem to have a library for the microbit, and therefore no SHA256 function. Secondly, when compiling it doesn't seem to know about the eddystone advertising. Need to look through and see if it's being disabled somewhere and we need to define it in.
+Code for SHA256 is here: https://tls.mbed.org/sha-256-source-code
+The mbed is a similar device to the microbit, and so this code ought to be optimised well for it. Just save both sections as the sha256.h and sha256.c and drop it into the same folder. you can then follow the api documentation to call on this md5 rather than the openssl version.
+
+
+
+=============================================
 =			Notes from config.json			=
 =============================================
 // Technique for UID generation from:
