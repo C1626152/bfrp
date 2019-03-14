@@ -48,8 +48,8 @@ int hashCompare(unsigned char*,unsigned char*);
 void hashPrinter(unsigned char hash[], int length);
 // Turns unsigned char hashes into strings for SHA256 alg to interpret
 unsigned char* toString(struct block);
-// Print one block
-// void printBlock();
+// SHA256 hash call
+void calc_sha_256(uint8_t hash[32], const void * input, size_t len);
 // Check for new messages
 char* checkNewMessages(char* newHash);
 // Check for new devices within broadcast range
@@ -88,7 +88,7 @@ struct block* addBlock(int data, unsigned char* sessionObjectives, time_t curren
 		// head now equals a memory address
 		head = (struct block*)malloc(sizeof(struct block));
 		// Hash "" and the size of "" and store in previous hash location(retrived from head)
-		calc_sha_256((unsigned char*)"", sizeof(""), head->prevHash);
+		calc_sha_256(head->prevHash, "", strlen(""));
 		// head should now read block data
 		head->data = data;
 
@@ -121,7 +121,7 @@ struct block* addBlock(int data, unsigned char* sessionObjectives, time_t curren
 	newBlock->serialisationNumber = serialisationNumber;
 
 	// Generate hash of current block and old block?
-	calc_sha_256(toString(*currentBlock), sizeof(*currentBlock), newBlock->prevHash);
+	calc_sha_256(toString(newBlock->prevHash, toString(*currentBlock), strlen(toString(*currentBlock)));
 	
 	// Update lastBlock
 	strncpy(lastBlock, hashData, 32);
@@ -140,7 +140,6 @@ void run_once_initialisation()
 
 }
 
-// Possible to remove this(?)
 void verifyChain()
 {
 	// If empty, say so
@@ -154,10 +153,10 @@ void verifyChain()
 	while(curr)
 	{
 		printf("%d\t[%d]\t\n", count++, curr->data);
-		hashPrinter(calc_sha_256(toString(*prev), sizeof(*prev), NULL) ,SHA256_DIGEST_LENGTH);
+		hashPrinter(calc_sha_256(NULL, toString(*prev), strlen(toString(*prev))) ,SHA256_DIGEST_LENGTH);
 		printf(" - ");
 		hashPrinter(curr->prevHash, SHA256_DIGEST_LENGTH);
-		if(hashCompare(SHA256(toString(*prev), sizeof(*prev), NULL), curr->prevHash))
+		if(hashCompare(calc_sha_256(NULL, toString(*prev), strlen(toString(*prev))), curr->prevHash))
 			printf("Verified!\n");
 		else
 			printf("Verification Failed! :(\n");
@@ -188,8 +187,9 @@ void hashPrinter(unsigned char hash[], int length)
 int hashCompare(unsigned char *str1, unsigned char *str2)
 {
 	for(int i = 0; i<SHA256_DIGEST_LENGTH; i++)
-		if(str1[i]!=str2[i])
+		if(str1[i]!=str2[i]){
 			return 0;
+		}
 		return 1;
 }
 
@@ -213,7 +213,7 @@ int checkNewDevices(char* guestHash)
 {
 	ManagedString s = uBit.radio.datagram.recv();
 
-    (if(s.length() != 0)
+    if(s.length() != 0)
     {
 		struct block *currentBlock = head;
 		while(currentBlock->link != NULL){
@@ -237,7 +237,7 @@ int checkNewDevices(char* guestHash)
     else{
       return 0;
     }
-  }
+
   return 0;
 }
 
