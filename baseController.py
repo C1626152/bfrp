@@ -1,11 +1,12 @@
 import myUsb
 from myUsb import Queue
 import json
-from hashlib import *
+from hashlib import sha256
 import random
 import unittest
 import webbrowser
 import os
+import sys
 
 # stores all current data
 currentData = []
@@ -95,11 +96,12 @@ def strToFile(data, filename):
 
 # Write the session objectives and return as a hashnumber
 # Also adds unhashed objectives to a dict obj
-print("ok so far 7")
 def writeSessionObj():
 	tempObj = ''
-	newSessionObj = raw_input("\nInput session objectives for this session:\n")
+	newSessionObj = input("\nInput session objectives for this session:\n")
+	print("ok input")
 	tempObj = hashIt(newSessionObj)
+	print("Ok hash")
 	hashList[tempObj] = newSessionObj
 
 
@@ -111,7 +113,9 @@ def writeUserHash():
 
 
 def hashIt(data):
+	print("Trying to hash")
 	hashOut = str(hashlib.sha256(data))
+	print("I done a hash!")
 
 # Future functionality is intended to modify this script and allow rewriting of the microbit on the fly
 # def writeToMicrobit(data):
@@ -144,23 +148,25 @@ def hashIt(data):
 	else:
 		# Ensure that the script returns to sending signal code
 		return"""
-print("ok so far 10")
-def quitProg():
-	sys.exit()
 
-print("ok so far 11")
+def quitProg():
+	try:
+		sys.exit()
+	except:
+		os._exit(1)
+
 def sesObj():
 	writeSessionObj()
 	myUsb.send(sessionObjectives)
 
-print("ok so far 12")
-def bData():
+
+def showData():
 	try:
 		display(data = currentData, hashData = currentHash, hashlist = hashList)
 	except:
 		print("\nError displaying data! D:\n")
 
-print("ok so far 13")
+
 def genHash():
 	writeUserHash()
 	print("New user hash: \n")
@@ -177,24 +183,33 @@ def main():
 	except:
 		print("\nUSB Connection error!\n")
 	print("Second Main, ok")
-	choice = { 0 : quitProg,
-			1 : sObj,
-			2 : bData,
-			3 : genHash}
+		          
 	print("Trying to give the user a choice...")
 	while True:
-		try: 
-			choice[input("Select Option:\n 1 - Write session objectives\n 2 - Read block data\n 3 - Generate user hashes for visitor tags \n 4 - ###UNUSED CURRENTLY### 0 - Exit")]()
+		try:
+			choice = input("Select Option:\n 1 - Write session objectives\n 2 - Read block data\n 3 - Generate user hashes for visitor tags \n 0 - Exit \n") 
+			if choice == "0":
+				quitProg();
+			elif choice == "1":
+				sesObj()
+			elif choice == "2":
+				showData()
+			elif choice == "3":
+				genHash()
+			else:
+				print("That isn't an available option")
 		except:
-			print("That isn't an available option") #should implement proper logging here and evaluate the catch
+			print("An error occurred") #should implement proper logging here and evaluate the catch
 			return True
 		
 		datalist = []
-		for i in incoming:
-			datalist.append(i)
-			incoming.dequeue(i)
-		for j in datalist:
-			currentData.append(j)
+	while True:
+		item = myUsb.incoming.get()
+		datalist.append(item)
+		myUsb.incoming.task_done()
+	myUsb.incoming.join()
+	for j in datalist:
+            currentData.append(j)
 main()
 """
 TO DO:

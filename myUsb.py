@@ -3,12 +3,19 @@ import usb.core
 import usb.util
 
 # Follow this: https://www.youtube.com/watch?v=xH_y05pIDTo
-pid = "2514"
-vid = "0424"
+pid = 516
+vid = 3368
 ports = serial.tools.list_ports.comports()
-address = next(port for port in ports if (port.pid == pid and port.vid == vid))
-out = serial.Serial(port=address, baudrate=115200, timeout=1)
-
+for i in ports:
+    print(i.pid , ", " , i.vid , "\n")
+    print(i.hwid , "\n")
+    print(i.manufacturer , " " , i.product , "\n")
+    print(i.description , "\n")
+    print(i.device , "\n")
+    print(i.location , "\n\n\n")
+device = next(port for port in ports if (port.pid==pid and port.vid==vid))
+addr = str(device.device)
+out = serial.Serial(port = addr, baudrate = 115200, timeout = 1)
 
 # Python script to handle data from RPi to microbit and back again
 # To do:
